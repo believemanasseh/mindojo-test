@@ -6,8 +6,8 @@ import MatrixDisplay from "./components/MatrixDisplay";
 import {
   useGetGridsQuery,
   useGetResultQuery,
-} from "../hooks/features/api/apiSlice";
-import { setCurrentIndex } from "../hooks/features/app/appSlice";
+} from "./hooks/features/api/apiSlice";
+import { setCurrentIndex } from "./hooks/features/app/appSlice";
 import "./App.css";
 
 const dummyItems = [
