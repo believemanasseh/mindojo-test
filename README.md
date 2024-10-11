@@ -1,5 +1,7 @@
 # Mindojo Test
 
+This project implements a full-stack application utilising React for the frontend and FastAPI for the backend to solve a task challenge involving Breadth-First Search (BFS). The application allows users to visualise the grids from the google spreadsheet and result (number of cells and coordinates) in a user-friendly interface.
+
 ## Prerequisites
 
 Make sure you have the following installed:
