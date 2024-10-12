@@ -1,111 +1,119 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
 import { Tabs, Button } from "antd";
-import MatrixDisplay from "./components/MatrixDisplay";
-import {
-  useGetGridsQuery,
-  useGetResultQuery,
-} from "./hooks/features/api/apiSlice";
-import { setCurrentIndex } from "./hooks/features/app/appSlice";
 import "./App.css";
+import {
+  useFetchGridsQuery,
+  useFetchResultQuery,
+} from "./hooks/features/api/apiSlice";
+import { setCurrentIndex } from "./hooks/features/reducers/defaultSlice";
+import Loader from "./components/Loader";
+import Grid from "./components/Grid";
 
 const dummyItems = [
   {
-    key: "1",
+    key: 0,
     label: "Case 1",
     children: [],
   },
   {
-    key: "2",
+    key: 1,
     label: "Case 2",
     children: [],
   },
   {
-    key: "3",
+    key: 2,
     label: "Case 3",
     children: [],
   },
   {
-    key: "4",
+    key: 3,
     label: "Case 4",
     children: [],
   },
   {
-    key: "5",
+    key: 4,
     label: "Case 5",
+    children: [],
+  },
+  {
+    key: 5,
+    label: "Case 6",
     children: [],
   },
 ];
 
-function App() {
+export default function App() {
   const dispatch = useDispatch();
-  const defaultState = useSelector((state) => state.defaultState);
+  const defaultState = useSelector((state) => state.default);
   const [items, setItems] = useState(dummyItems);
   const [showResult, setShowResult] = useState(false);
-  const fetchGrids = useGetGridsQuery(defaultState.currentIndex);
-  const fetchResult = useGetResultQuery(defaultState.currentIndex);
+
+  const fetchGrid = useFetchGridsQuery(defaultState.currentIndex);
+  const fetchResult = useFetchResultQuery(defaultState.currentIndex);
 
   useEffect(() => {
-    if (!fetchGrids.isError && fetchGrids.data) {
-      const grid = fetchGrids.data.grid;
+    const newItems = items.map((item) =>
+      item.key === defaultState.currentIndex
+        ? {
+            ...item,
+            children: fetchGrid.isLoading ? (
+              <Loader />
+            ) : (
+              <Grid grid={fetchGrid.data.grid} />
+            ),
+          }
+        : item
+    );
 
-      setItems((prevItems) =>
-        prevItems.map((item) =>
-          item.key === `${defaultState.currentIndex + 1}`
-            ? { ...item, children: grid }
-            : item
-        )
-      );
-    }
-  }, [fetchGrids, defaultState]);
+    if (JSON.stringify(items) !== JSON.stringify(newItems)) setItems(newItems);
+  }, [fetchGrid, items, defaultState.currentIndex]);
 
   const onChange = (key) => {
-    dispatch(setCurrentIndex(parseInt(key) - 1));
     setShowResult(false);
+    dispatch(setCurrentIndex(parseInt(key)));
   };
 
-  return (
-    <StyledComponent>
-      <div>
-        <Tabs defaultActiveKey="1" onChange={onChange}>
-          {items.map((item) => (
-            <Tabs.TabPane tab={item.label} key={item.key}>
-              <MatrixDisplay
-                data={item.children}
-                currentIndex={defaultState.currentIndex}
-              />
-            </Tabs.TabPane>
-          ))}
-        </Tabs>
+  if (fetchGrid.isLoading || fetchResult.isLoading) return <Loader />;
 
-        <Button
-          type="primary"
-          className="btn"
-          onClick={() => setShowResult(true)}
-        >
-          Show Results
-        </Button>
-      </div>
-      <div className="result">
-        {showResult ? (
-          <div>
+  return (
+    <>
+      <StyledComponent>
+        <div className="grids">
+          <Tabs defaultActiveKey="0" items={items} onChange={onChange} />;
+          <Button type="primary" onClick={() => setShowResult(true)}>
+            Show Result
+          </Button>
+        </div>
+        <div className="results">
+          {showResult && (
             <div>
-              The number of cells that can reach both NW and SE edges:{" "}
-              {fetchResult.data.numOfCells}
+              <h4>
+                Number of cells that can flow to both edges:{" "}
+                {fetchResult.data.numOfCells}
+              </h4>
+              <h4>The coordinates are shown in the array below:</h4>
+              <p>
+                [
+                {fetchResult.data.coordinates.map((coordinate, index) => {
+                  let showComma = true;
+                  if (index === fetchResult.data.coordinates.length - 1) {
+                    showComma = false;
+                  }
+                  return (
+                    <span key={index}>
+                      ({coordinate[0]}, {coordinate[1]}){showComma && ","}{" "}
+                    </span>
+                  );
+                })}
+                ]
+              </p>
             </div>
-            The cell coordinates are given below:
-            {fetchResult.data.coordinates.map((coord, index) => (
-              <div key={index}>
-                {coord[0]}, {coord[1]}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div></div>
-        )}
-      </div>
-    </StyledComponent>
+          )}
+        </div>
+      </StyledComponent>
+    </>
   );
 }
 
@@ -113,17 +121,9 @@ const StyledComponent = styled.div`
   height: 100vh;
   width: auto;
   display: flex;
-  flex-flow: row nowrap;
   gap: 100px;
-  justify-content: center;
 
-  .btn {
-    margin-top: 40px;
-  }
-
-  .result {
-    margin-top: 10px;
+  button {
+    margin-top: 30px;
   }
 `;
-
-export default App;

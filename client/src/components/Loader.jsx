@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export function Spinner() {
+export default function Loader() {
   return (
     <StyledComponent>
       <span className="loader"></span>
@@ -12,7 +12,7 @@ const StyledComponent = styled.div`
   .loader {
     width: 48px;
     height: 48px;
-    border: 5px solid #12179a;
+    border: 5px solid #4a4fed;
     border-bottom-color: transparent;
     border-radius: 50%;
     display: inline-block;

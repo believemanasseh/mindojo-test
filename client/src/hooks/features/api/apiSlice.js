@@ -2,21 +2,21 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000/v1/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000/v1" }),
   endpoints: (builder) => ({
-    getGrids: builder.query({
-      query: (tabIndex) => ({
-        url: `grids/${tabIndex}`,
+    fetchGrids: builder.query({
+      query: (tab) => ({
         method: "GET",
+        url: `/grids/${tab}`,
       }),
     }),
-    getResult: builder.query({
-      query: (tabIndex) => ({
-        url: `results/${tabIndex}`,
+    fetchResult: builder.query({
+      query: (tab) => ({
         method: "GET",
+        url: `/results/${tab}`,
       }),
     }),
   }),
 });
 
-export const { useGetGridsQuery, useGetResultQuery } = apiSlice;
+export const { useFetchGridsQuery, useFetchResultQuery } = apiSlice;
