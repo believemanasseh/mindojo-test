@@ -6,8 +6,8 @@ import "./App.css";
 import {
   useFetchGridsQuery,
   useFetchResultQuery,
-} from "./hooks/features/api/apiSlice";
-import { setCurrentIndex } from "./hooks/features/reducers/defaultSlice";
+} from "./redux/features/api/apiSlice";
+import { setCurrentIndex } from "./redux/features/reducers/defaultSlice";
 import Loader from "./components/Loader";
 import Grid from "./components/Grid";
 
